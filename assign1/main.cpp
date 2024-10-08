@@ -131,7 +131,20 @@ void write_courses_offered(std::vector<Course> &all_courses) {
  * @param unlisted_courses A vector of courses that are not offered.
  */
 void write_courses_not_offered(std::vector<Course> &unlisted_courses) {
-  /* (STUDENT TODO) Your code goes here... */
+    std::ofstream ofs("./student_output/courses_not_offered.csv");
+    if (!ofs.is_open()) {
+        std::cerr << "Error when open courses_not_offered.csv!\n";
+        return;
+    }
+
+    // Column header row
+    ofs << "Title,Number of Units,Quarter\n";
+    for (auto &course : unlisted_courses) {
+        ofs << course.title << ',' << course.number_of_units << ',' << course.quarter << '\n';
+    }
+    ofs.close();
+    // Clear unlisted_courses
+    unlisted_courses.clear();
 }
 
 int main() {
@@ -147,6 +160,6 @@ int main() {
 
   /* Uncomment for debugging... */
   print_courses(courses);
-  
+
   return run_autograder();
 }
