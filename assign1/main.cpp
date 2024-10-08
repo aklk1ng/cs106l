@@ -31,13 +31,6 @@ struct Course {
 };
 
 /**
- * (STUDENT TODO) Look at how the main function (at the bottom of this file)
- * calls `parse_csv`, `write_courses_offered`, and `write_courses_not_offered`.
- * Modify the signatures of these functions so that they work as intended, and then delete this
- * comment!
- */
-
-/**
  * Note:
  * We need to #include utils.cpp _after_ we declare the Course struct above
  * so that the code inside utils.cpp knows what a Course is.
@@ -97,8 +90,31 @@ void parse_csv(std::string filename, std::vector<Course> &courses) {
  * @param all_courses A vector of all courses gotten by calling `parse_csv`.
  *                    This vector will be modified by removing all offered courses.
  */
-void write_courses_offered(std::vector<Course> all_courses) {
-  /* (STUDENT TODO) Your code goes here... */
+void write_courses_offered(std::vector<Course> &all_courses) {
+    std::ofstream ofs("./student_output/courses_offered.csv");
+    if (!ofs.is_open()) {
+        std::cerr << "Error when open courses_offered.csv!\n";
+        return;
+    }
+
+    // Column header row
+    ofs << "Title,Number of Units,Quarter\n";
+
+    std::vector<Course> offered_courses;
+    for (auto &course : all_courses) {
+        if (course.quarter != "null") {
+            offered_courses.push_back(course);
+        }
+    }
+    // Write all offered_courses to file
+    for (auto &course : offered_courses) {
+        ofs << course.title << ',' << course.number_of_units << ',' << course.quarter << '\n';
+    }
+    ofs.close();
+    // Delete offered_courses in all_courses
+    for (auto &course : offered_courses) {
+        delete_elem_from_vector(all_courses, course);
+    }
 }
 
 /**
@@ -114,7 +130,7 @@ void write_courses_offered(std::vector<Course> all_courses) {
  *
  * @param unlisted_courses A vector of courses that are not offered.
  */
-void write_courses_not_offered(std::vector<Course> unlisted_courses) {
+void write_courses_not_offered(std::vector<Course> &unlisted_courses) {
   /* (STUDENT TODO) Your code goes here... */
 }
 
@@ -125,11 +141,12 @@ int main() {
   std::vector<Course> courses;
   parse_csv("courses.csv", courses);
 
-  /* Uncomment for debugging... */
-  print_courses(courses);
 
   write_courses_offered(courses);
   write_courses_not_offered(courses);
 
+  /* Uncomment for debugging... */
+  print_courses(courses);
+  
   return run_autograder();
 }
