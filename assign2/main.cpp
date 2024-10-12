@@ -10,13 +10,14 @@
 #include <fstream>
 #include <iostream>
 #include <queue>
+#include <random>
 #include <set>
 #include <string>
 #include <unordered_set>
 
 #include "utils.h"
 
-std::string kYourName = "STUDENT TODO"; // Don't forget to change this!
+std::string kYourName = "Levi Moss"; // Don't forget to change this!
 
 /**
  * Takes in a file name and returns a set containing all of the applicant names as a set.
@@ -29,7 +30,19 @@ std::string kYourName = "STUDENT TODO"; // Don't forget to change this!
  * below it) to use a `std::unordered_set` instead.
  */
 std::set<std::string> get_applicants(std::string filename) {
-  // STUDENT TODO: Implement this function.
+    std::set<std::string> s;
+    std::ifstream fs(filename);
+    if (!fs.is_open()) {
+        std::cerr << "Error when open file!\n";
+        return s;
+    }
+
+    std::string line;
+    while (getline(fs, line)) {
+        s.insert(line);
+    }
+    fs.close();
+    return s;
 }
 
 /**
@@ -41,7 +54,13 @@ std::set<std::string> get_applicants(std::string filename) {
  * @return          A queue containing pointers to each matching name.
  */
 std::queue<const std::string*> find_matches(std::string name, std::set<std::string>& students) {
-  // STUDENT TODO: Implement this function.
+    std::queue<const std::string*> q;
+    for (const auto &stu : students) {
+        if (stu[0] == name[0]) {
+            q.push(&name);
+        }
+    }
+    return q;
 }
 
 /**
@@ -55,7 +74,19 @@ std::queue<const std::string*> find_matches(std::string name, std::set<std::stri
  *                Will return "NO MATCHES FOUND." if `matches` is empty.
  */
 std::string get_match(std::queue<const std::string*>& matches) {
-  // STUDENT TODO: Implement this function.
+    if (matches.empty()) {
+        return "NO MATCHES FOUND";
+    }
+    // Just use a random number to choose a name
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> rn(1, matches.size());
+    int num = rn(gen);
+
+    while (num--) {
+        matches.pop();
+    }
+    return *matches.front();
 }
 
 /* #### Please don't modify this call to the autograder! #### */
