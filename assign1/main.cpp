@@ -52,7 +52,7 @@ struct Course {
  * @param courses  A vector of courses to populate.
  */
 void parse_csv(std::string filename, std::vector<Course> &courses) {
-    std::fstream fs(filename);
+    std::ifstream fs(filename);
     if (!fs.is_open()) {
         std::cerr << "Error when read the csv file!\n";
         return;
