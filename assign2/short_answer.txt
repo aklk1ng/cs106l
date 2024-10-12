@@ -6,7 +6,16 @@ Marriage Pact
 
 Q1. It is your choice to use either an ordered or unordered set. In a few sentences, what are some of the tradeoffs between the two? Additionally, please give an example (that has not been shown in lecture) of a valid hash function that could be used to hash student names for an unordered set.
 A1. TODO
-Unordered set is disordered when iterate it
+Unordered set implements a hash table, does not maintain any particular order of elements
+std::size_t hash(const std::string &name) const {
+  std::size_t hash = 0;
+  for (auto c : name) {
+    hash = hash * 31 + c;
+  }
+  return hash ^ (name.len() << 3);
+}
 
 Q2. Note that we are saving pointers to names in the queue, not names themselves. Why might this be desired in this problem? What happens if the original set where the names are stored goes out of scope and the pointers are referenced?
 A2. TODO
+1. Save memory - By avoid copying std::string object into memory instead of storing pointers
+2. Dangling pointers - The pointers in the queue will point to a memory that has been destroyed once the original set goes out of scope
