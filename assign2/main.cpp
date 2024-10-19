@@ -27,7 +27,8 @@ std::string kYourName = "Levi Moss"; // Don't forget to change this!
  * @returns         A set of all applicant names read from the file.
  *
  * @remark Feel free to change the return type of this function (and the function
- * below it) to use a `std::unordered_set` instead.
+ * below it) to use a `std::unordered_set` instead. If you do so, make sure
+ * to also change the corresponding functions in `utils.h`.
  */
 std::set<std::string> get_applicants(std::string filename) {
     std::set<std::string> s;
