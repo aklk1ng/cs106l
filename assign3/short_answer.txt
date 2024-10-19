@@ -5,7 +5,7 @@ Make a Class
 ------------
 
 Q1. What’s const-correctness and why is it important?
-A1. TODO
+A1. const-correctness is if we don't need modify entire object, we should use the const to mark an entire object read-only.
 
 Q2. Is your class const-correct? How do you know?
-A2. TODO
+A2. Yes, i check each method and confirm whether they need to change the object, if not, i will add the const interface.
