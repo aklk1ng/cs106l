@@ -22,6 +22,10 @@ class_decl: declarations.class_t = None
 definitions: Set[Tuple[str, str]] = None
 
 
+def norm_path(path: os.PathLike) -> os.PathLike:
+    return os.path.normpath(os.path.relpath(path, os.getcwd()))
+
+
 def install_castxml():
     bin_path = os.environ.get("VIRTUAL_ENV_BIN")
     castxml_dir = os.path.join(bin_path, "castxml")
@@ -49,7 +53,7 @@ def install_castxml():
             return "linux.tar.gz"
         elif os_name == "darwin":
             # Need to handle running Python under Rosetta on Apple Silicon
-            brand = cpuinfo.get_cpu_info()['brand_raw']
+            brand = cpuinfo.get_cpu_info()["brand_raw"]
             if "arm" in arch or re.match(r"Apple M\d+", brand):
                 return "macos-arm.tar.gz"
             return "macosx.tar.gz"
@@ -185,7 +189,7 @@ def setup():
                 "Couldn't find the path to g++. Did you follow the setup instructions?\n\nhttps://github.com/cs106l/cs106l-assignments"
             )
         compiler_path = result.stdout.strip()
-        compiler_path = f'"(" {compiler_path} -std=c++11 ")"'
+        compiler_path = f'"(" "{compiler_path}" -std=c++11 ")"'
 
     # Configure the C++ parser
     xml_generator_config = parser.xml_generator_configuration_t(
@@ -198,7 +202,7 @@ def setup():
     )
 
     try:
-        decls = parser.parse([main_cpp_path], xml_generator_config)
+        decls = parser.parse([norm_path(main_cpp_path)], xml_generator_config)
         global_namespace = declarations.get_global_namespace(decls)
         classes = global_namespace.classes()
     except Exception as e:
@@ -218,10 +222,13 @@ def setup():
         cls_decl: declarations.class_t
         for cls_decl in classes:
             location: declarations.location_t = cls_decl.location
-            if os.path.normpath(class_h_path) == os.path.normpath(location.file_name):
+            if norm_path(class_h_path) == norm_path(location.file_name):
                 return cls_decl
         raise Exception(
-            'Couldn\'t find a class inside of class.h. Possible reasons:\n - Did you define one?\n - Did you #include "class.h" inside main.cpp?'
+            "Couldn't find a class inside of class.h. Possible reasons:\n"
+            " - Did you define one?\n"
+            ' - Did you #include "class.h" inside main.cpp?\n'
+            " - Did you construct an instance of the class inside main.cpp?"
         )
 
     global class_decl
@@ -366,7 +373,7 @@ def get_prefix_functions(
 
 def find_matching_function(prefix: str, type: str):
     fields = get_private_fields()
-    field_names = { f.name.lower(): f for f in fields }
+    field_names = {f.name.lower().strip("_"): f for f in fields}
     funcs = get_prefix_functions(prefix)
 
     for func, field_name in funcs:
@@ -403,7 +410,9 @@ def test_setter_function():
         len(function.arguments) == 1
     ), "A setter should have a single argument matching the type of its field"
 
-    assert declarations.base_type(function.argument_types[0]) == declarations.base_type(field.decl_type), (
+    assert declarations.base_type(function.argument_types[0]) == declarations.base_type(
+        field.decl_type
+    ), (
         f"The argument of a setter should be the type of its field. "
         f"Found {function.argument_types[0]} but expected {field.decl_type}"
     )
