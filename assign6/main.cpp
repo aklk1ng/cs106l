@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <optional>
 
 /** STUDENT_TODO: You will need to include a relevant header file here! */
 
@@ -51,11 +52,14 @@ public:
    * @param course_title The title of the course to find.
    * @return You will need to figure this out!
    */
-  FillMeIn find_course(std::string course_title)
+  std::optional<Course> find_course(std::string course_title)
   {
-    /* STUDENT_TODO: Implement this method! You will need to change the return
-     * type. */
-    throw std::runtime_error("find_course not implemented");
+      for (auto &course : this->courses) {
+          if (course.title == course_title) {
+              return course;
+          }
+      }
+      return {};
   }
 
 private:
@@ -66,8 +70,8 @@ int
 main(int argc, char* argv[])
 {
   static_assert(
-    !std::is_same_v<std::result_of<decltype (&CourseDatabase::find_course)(
-                      CourseDatabase, std::string)>::type,
+          !std::is_same_v<std::invoke_result_t<decltype (&CourseDatabase::find_course), 
+          CourseDatabase, std::string>,
                     FillMeIn>,
     "You must change the return type of CourseDatabase::find_course to "
     "something other than FillMeIn.");
@@ -76,9 +80,7 @@ main(int argc, char* argv[])
     CourseDatabase db("autograder/courses.csv");
     auto course = db.find_course(argv[1]);
 
-    /* STUDENT_TODO: Change this condition. How can you check if the database
-     * has the desired course? */
-    if (false) {
+    if (course.has_value()) {
       std::cout << "Found course: " << course->title << ","
                 << course->number_of_units << "," << course->quarter << "\n";
     } else {
