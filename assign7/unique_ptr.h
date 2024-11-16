@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 
 /**
@@ -10,7 +11,7 @@
  */
 template <typename T> class unique_ptr {
 private:
-  /* STUDENT TODO: What data must a unique_ptr keep track of? */
+    T* data;
 
 public:
   /**
@@ -18,17 +19,13 @@ public:
    * @param ptr The pointer to manage.
    * @note You should avoid using this constructor directly and instead use `make_unique()`.
    */
-  unique_ptr(T* ptr) {
-    /* STUDENT TODO: Implement the constructor */
-    throw std::runtime_error("Not implemented: unique_ptr(T* ptr)");
+  unique_ptr(T* ptr) : data(ptr) {
   }
 
   /**
    * @brief Constructs a new `unique_ptr` from `nullptr`.
    */
-  unique_ptr(std::nullptr_t) {
-    /* STUDENT TODO: Implement the nullptr constructor */
-    throw std::runtime_error("Not implemented: unique_ptr(std::nullptr_t)");
+  unique_ptr(std::nullptr_t) : data(nullptr) {
   }
 
   /**
@@ -42,8 +39,10 @@ public:
    * @return A reference to the object.
    */
   T& operator*() {
-    /* STUDENT TODO: Implement the dereference operator */
-    throw std::runtime_error("Not implemented: operator*()");
+      if (!this->data) {
+        throw std::runtime_error("Dereference a nullptr");
+      }
+      return *this->data;
   }
 
   /**
@@ -51,8 +50,10 @@ public:
    * @return A const reference to the object.
    */
   const T& operator*() const {
-    /* STUDENT TODO: Implement the dereference operator (const) */
-    throw std::runtime_error("Not implemented: operator*() const");
+      if (!this->data) {
+        throw std::runtime_error("Dereference a nullptr");
+      }
+      return *this->data;
   }
 
   /**
@@ -61,8 +62,10 @@ public:
    * @return A pointer to the object.
    */
   T* operator->() {
-    /* STUDENT TODO: Implement the arrow operator */
-    throw std::runtime_error("Not implemented: operator->()");
+      if (!this->data) {
+        throw std::runtime_error("Dereference a nullptr");
+      }
+      return this->data;
   }
 
   /**
@@ -71,8 +74,10 @@ public:
    * @return A const pointer to the object.
    */
   const T* operator->() const {
-    /* STUDENT TODO: Implement the arrow operator */
-    throw std::runtime_error("Not implemented: operator->() const");
+      if (!this->data) {
+        throw std::runtime_error("Dereference a nullptr");
+      }
+      return this->data;
   }
 
   /**
@@ -81,17 +86,25 @@ public:
    * @return `true` if the `unique_ptr` is non-null, `false` otherwise.
    */
   operator bool() const {
-    /* STUDENT TODO: Implement the boolean conversion operator */
-    throw std::runtime_error("Not implemented: operator bool() const");
+      return this->data != nullptr;
   }
 
-  /** STUDENT TODO: In the space below, do the following:
-   * - Implement a destructor
-   * - Delete the copy constructor
-   * - Delete the copy assignment operator
-   * - Implement the move constructor
-   * - Implement the move assignment operator
-   */
+  ~unique_ptr() {
+      delete this->data;
+  }
+  unique_ptr(const unique_ptr& other) = delete;
+  unique_ptr& operator=(const unique_ptr& other) = delete;
+  unique_ptr(unique_ptr&& other) : data(other.data) {
+      other.data = nullptr;
+  }
+  unique_ptr& operator=(unique_ptr&& other) {
+      if (this != &other) {
+          delete this->data;
+          this->data = other.data;
+          other.data = nullptr;
+      }
+      return *this;
+  }
 };
 
 /**
