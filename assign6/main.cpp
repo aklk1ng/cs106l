@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <type_traits>
 #include <vector>
 #include <optional>
 
@@ -70,8 +71,8 @@ int
 main(int argc, char* argv[])
 {
   static_assert(
-          !std::is_same_v<std::invoke_result_t<decltype (&CourseDatabase::find_course), 
-          CourseDatabase, std::string>,
+    !std::is_same_v<std::invoke_result_t<decltype (&CourseDatabase::find_course), 
+                      CourseDatabase, std::string>,
                     FillMeIn>,
     "You must change the return type of CourseDatabase::find_course to "
     "something other than FillMeIn.");
